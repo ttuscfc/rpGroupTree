@@ -1,6 +1,5 @@
 package org.example.grouptree;
 
-import org.example.grouptree.model.FileProcessor;
 import org.example.grouptree.service.FileProcessorService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
@@ -10,12 +9,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @SpringBootApplication
 public class GroupTreeApplication implements CommandLineRunner {
 
-    private final FileProcessorService fileProcessorService;
-
     @Autowired
-    public GroupTreeApplication(FileProcessorService fileProcessorService) {
-        this.fileProcessorService = fileProcessorService;
-    }
+    private FileProcessorService fileProcessorService;
 
     public static void main(String[] args) {
         SpringApplication.run(GroupTreeApplication.class, args);
@@ -24,8 +19,10 @@ public class GroupTreeApplication implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
         System.out.println("Starting group tree application");
-        // Carregar o JSON do arquivo ao iniciar o sistema
-        fileProcessorService.loadJsonFromFile("C:/Users/matheus.cabral/Documents/RP Info/teste.txt");
+
+        String filePath = "C:/Users/matheus.cabral/Documents/RP Info/teste.txt";
+        fileProcessorService.loadJsonFromFile(filePath);
+
         System.out.println("Finished group tree application");
     }
 

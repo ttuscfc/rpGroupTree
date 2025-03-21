@@ -1,24 +1,24 @@
 package org.example.grouptree.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.example.grouptree.model.TreeNode;
 import org.springframework.stereotype.Service;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 @Service
 public class FileProcessorService {
 
-    private Map<String, Object> globalJson;
+    private TreeNode globalJson;
 
     // Método para processar o arquivo e construir o JSON
     public void loadJsonFromFile(String filePath) throws IOException {
-        Map<String, Object> treeMap = new HashMap<>();
-        List<Map<String, Object>> gruposList = new ArrayList<>();
+        TreeNode root = new TreeNode("grupos", "");  // Nó raiz com o nome "grupos"
 
         try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
             String header = reader.readLine(); // Lê a primeira linha (cabeçalho)
@@ -56,16 +56,15 @@ public class FileProcessorService {
                 String descricao = values[descriptionIndex];
 
                 String formattedClassification = applyMask(classification);
-                addToJsonTree(treeMap, formattedClassification, descricao);
+                addToJsonTree(root, formattedClassification, descricao);
             }
         }
 
-        treeMap.put("grupos", gruposList);
-        globalJson = treeMap;  // Armazena o JSON na variável global
+        globalJson = root;  // Armazena a árvore de grupos no objeto globalJson
     }
 
     // Método para retornar o JSON completo
-    public Map<String, Object> getGlobalJson() {
+    public TreeNode getGlobalJson() {
         return globalJson;
     }
 
@@ -102,58 +101,78 @@ public class FileProcessorService {
     }
 
     // Método para adicionar os dados ao JSON em árvore
-    private void addToJsonTree(Map<String, Object> treeMap, String classification, String descricao) {
+    private void addToJsonTree(TreeNode root, String classification, String descricao) {
         String[] parts = classification.split("\\.");
         StringBuilder path = new StringBuilder();
 
-        Map<String, Object> currentNode = treeMap;
+        TreeNode currentNode = root;
         for (String part : parts) {
             path.append(part);
             String pathStr = path.toString();
 
-            Map<String, Object> nextNode = (Map<String, Object>) currentNode.get(pathStr);
+            TreeNode nextNode = findNode(currentNode, pathStr);
             if (nextNode == null) {
-                nextNode = new HashMap<>();
-                currentNode.put(pathStr, nextNode);
+                nextNode = new TreeNode(pathStr, "");
+                currentNode.addGrupo(nextNode);
             }
+
             currentNode = nextNode;
             path.append(".");
         }
 
-        currentNode.put("classificacao", classification);
-        currentNode.put("descricao", descricao);
+        // Adiciona a classificação e descrição ao nó final
+        currentNode.setClassificacao(classification);
+        currentNode.setDescricao(descricao);
     }
 
-    // Método para filtrar por classificação
-    public Map<String, Object> filterByClassificacao(Map<String, Object> json, String classificacao) {
-        List<Map<String, Object>> filteredGrupos = new ArrayList<>();
+    // Método para encontrar um nó existente na árvore pelo path
+    private TreeNode findNode(TreeNode parent, String path) {
+        for (TreeNode grupo : parent.getGrupos()) {
+            if (grupo.getClassificacao().equals(path)) {
+                return grupo;
+            }
+        }
+        return null;
+    }
 
-        List<Map<String, Object>> grupos = (List<Map<String, Object>>) json.get("grupos");
-        for (Map<String, Object> grupo : grupos) {
-            Map<String, Object> filtered = filterGrupoByClassificacao(grupo, classificacao);
-            if (filtered != null) {
-                filteredGrupos.add(filtered);
+    /*// Método para aplicar a máscara à classificação
+    private String applyMask(String classificacao) {
+        // Defina a máscara de forma dinâmica: por exemplo, "9.99.999.9999"
+        // ou a lógica para dividir em grupos conforme a quantidade de dígitos
+        StringBuilder formatted = new StringBuilder();
+        int[] mask = {1, 2, 3, 4}; // Exemplo de máscara que define a hierarquia de classificação
+
+        int index = 0;
+        for (int i = 0; i < mask.length; i++) {
+            int length = mask[i];
+            if (index + length <= classificacao.length()) {
+                formatted.append(classificacao.substring(index, index + length));
+                index += length;
+                if (i < mask.length - 1) {
+                    formatted.append(".");
+                }
             }
         }
 
-        Map<String, Object> filteredJson = new HashMap<>();
-        filteredJson.put("grupos", filteredGrupos);
-        return filteredJson;
+        return formatted.toString();
+    }*/
+
+    // Método para filtrar por classificação
+    public TreeNode filterByClassificacao(TreeNode json, String classificacao) {
+        return filterGrupoByClassificacao(json, classificacao);
     }
 
     // Método recursivo para filtrar os grupos por classificação
-    private Map<String, Object> filterGrupoByClassificacao(Map<String, Object> grupo, String classificacao) {
-        if (grupo.get("classificacao").equals(classificacao)) {
+    private TreeNode filterGrupoByClassificacao(TreeNode grupo, String classificacao) {
+        if (grupo.getClassificacao().equals(classificacao)) {
             return grupo;
         }
 
-        List<Map<String, Object>> subGrupos = (List<Map<String, Object>>) grupo.get("grupos");
-        if (subGrupos != null) {
-            for (Map<String, Object> subGrupo : subGrupos) {
-                Map<String, Object> filtered = filterGrupoByClassificacao(subGrupo, classificacao);
-                if (filtered != null) {
-                    return filtered;
-                }
+        // Verifica os subgrupos
+        for (TreeNode subGrupo : grupo.getGrupos()) {
+            TreeNode filtered = filterGrupoByClassificacao(subGrupo, classificacao);
+            if (filtered != null) {
+                return filtered;
             }
         }
 
