@@ -1,15 +1,12 @@
 package org.example.grouptree.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.example.grouptree.model.TreeNode;
 import org.springframework.stereotype.Service;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 public class FileProcessorService {
@@ -18,7 +15,7 @@ public class FileProcessorService {
 
     // Método para processar o arquivo e construir o JSON
     public void loadJsonFromFile(String filePath) throws IOException {
-        TreeNode root = new TreeNode("grupos", "");  // Nó raiz com o nome "grupos"
+        TreeNode rootNode = new TreeNode("grupos", "");
 
         try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
             String header = reader.readLine(); // Lê a primeira linha (cabeçalho)
@@ -56,11 +53,13 @@ public class FileProcessorService {
                 String descricao = values[descriptionIndex];
 
                 String formattedClassification = applyMask(classification);
-                addToJsonTree(root, formattedClassification, descricao);
+                addToJsonTree(rootNode, formattedClassification, descricao);
             }
         }
 
-        globalJson = root;  // Armazena a árvore de grupos no objeto globalJson
+        // Ordena a árvore
+        sortTree(rootNode);
+        globalJson = rootNode;  // Armazena o JSON na variável global
     }
 
     // Método para retornar o JSON completo
@@ -101,28 +100,40 @@ public class FileProcessorService {
     }
 
     // Método para adicionar os dados ao JSON em árvore
-    private void addToJsonTree(TreeNode root, String classification, String descricao) {
+    private void addToJsonTree(TreeNode rootNode, String classification, String descricao) {
         String[] parts = classification.split("\\.");
         StringBuilder path = new StringBuilder();
 
-        TreeNode currentNode = root;
+        TreeNode currentNode = rootNode;
         for (String part : parts) {
             path.append(part);
             String pathStr = path.toString();
 
-            TreeNode nextNode = findNode(currentNode, pathStr);
+            TreeNode nextNode = currentNode.getGrupoByClassificacao(pathStr);
             if (nextNode == null) {
                 nextNode = new TreeNode(pathStr, "");
                 currentNode.addGrupo(nextNode);
             }
-
             currentNode = nextNode;
             path.append(".");
         }
 
-        // Adiciona a classificação e descrição ao nó final
         currentNode.setClassificacao(classification);
         currentNode.setDescricao(descricao);
+    }
+
+    // Método recursivo para ordenar os grupos
+    private void sortTree(TreeNode rootNode) {
+        List<TreeNode> grupos = rootNode.getGrupos();
+        if (grupos != null) {
+            // Ordena os grupos na raiz
+            grupos.sort(Comparator.comparing(TreeNode::getClassificacao));
+
+            // Recursivamente ordena os subgrupos
+            for (TreeNode grupo : grupos) {
+                sortTree(grupo); // Ordena recursivamente
+            }
+        }
     }
 
     // Método para encontrar um nó existente na árvore pelo path
@@ -157,7 +168,7 @@ public class FileProcessorService {
         return formatted.toString();
     }*/
 
-    // Método para filtrar por classificação
+    /// Método para filtrar por classificação
     public TreeNode filterByClassificacao(TreeNode json, String classificacao) {
         return filterGrupoByClassificacao(json, classificacao);
     }
@@ -168,11 +179,13 @@ public class FileProcessorService {
             return grupo;
         }
 
-        // Verifica os subgrupos
-        for (TreeNode subGrupo : grupo.getGrupos()) {
-            TreeNode filtered = filterGrupoByClassificacao(subGrupo, classificacao);
-            if (filtered != null) {
-                return filtered;
+        List<TreeNode> subGrupos = grupo.getGrupos();
+        if (subGrupos != null) {
+            for (TreeNode subGrupo : subGrupos) {
+                TreeNode filtered = filterGrupoByClassificacao(subGrupo, classificacao);
+                if (filtered != null) {
+                    return filtered;
+                }
             }
         }
 

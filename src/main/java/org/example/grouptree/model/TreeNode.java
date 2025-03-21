@@ -44,6 +44,28 @@ public class TreeNode {
         this.grupos.add(grupo);
     }
 
+    // Método para encontrar um grupo baseado na classificação
+    public TreeNode getGrupoByClassificacao(String classificacao) {
+        for (TreeNode grupo : grupos) {
+            if (grupo.getClassificacao().equals(classificacao)) {
+                return grupo;
+            }
+        }
+        return null;
+    }
+
+    // Método para adicionar ou atualizar um grupo, baseado na classificação
+    public TreeNode addOrUpdateGrupo(String classificacao, String descricao) {
+        TreeNode grupo = getGrupoByClassificacao(classificacao);
+        if (grupo == null) {
+            grupo = new TreeNode(classificacao, descricao);
+            addGrupo(grupo);
+        } else {
+            grupo.setDescricao(descricao);  // Se já existe, atualiza a descrição
+        }
+        return grupo;
+    }
+
     @Override
     public String toString() {
         return "{" +
