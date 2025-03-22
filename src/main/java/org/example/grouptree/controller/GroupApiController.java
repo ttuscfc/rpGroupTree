@@ -5,6 +5,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.example.grouptree.model.TreeNode;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/grupos")
 public class GroupApiController {
@@ -18,12 +21,17 @@ public class GroupApiController {
 
     // API para retornar o JSON completo ou filtrado por classificação
     @GetMapping
-    public TreeNode getGrupos(@RequestParam(value = "classificacao", required = false) String classificacao) {
+    public List<TreeNode> getGrupos(@RequestParam(value = "classificacao", required = false) String classificacao) {
+        TreeNode globalJson = fileProcessorService.getGlobalJson();
+        List<TreeNode> allJson = new ArrayList<>();
+        if (globalJson != null) {
+            allJson = globalJson.getGrupos();
+        }
         if (classificacao == null || classificacao.isEmpty()) {
-            return fileProcessorService.getGlobalJson(); // Retorna o JSON completo (TreeNode)
+            return allJson; // Retorna o JSON completo
         } else {
-            // Filtra o JSON com base na classificação (TreeNode)
-            return fileProcessorService.filterByClassificacao(fileProcessorService.getGlobalJson(), classificacao);
+            // Filtra o JSON com base na classificacao
+            return fileProcessorService.filterByClassificacao(globalJson, classificacao);
         }
     }
 }

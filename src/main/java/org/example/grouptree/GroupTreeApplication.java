@@ -20,7 +20,7 @@ public class GroupTreeApplication implements CommandLineRunner {
     public void run(String... args) throws Exception {
         System.out.println("Starting group tree application");
 
-        String filePath = "C:/Users/matheus.cabral/Documents/RP Info/teste.txt";
+        String filePath = "C:/Users/matheus.cabral/Documents/RP Info/grupos.txt";
         fileProcessorService.loadJsonFromFile(filePath);
 
         System.out.println("Finished group tree application");

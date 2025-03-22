@@ -13,12 +13,12 @@ public class FileProcessorService {
 
     private TreeNode globalJson;
 
-    // Método para processar o arquivo e construir o JSON
+    // Metodo para processar o arquivo e construir o JSON
     public void loadJsonFromFile(String filePath) throws IOException {
         TreeNode rootNode = new TreeNode("grupos", "");
 
         try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
-            String header = reader.readLine(); // Lê a primeira linha (cabeçalho)
+            String header = reader.readLine(); // Le a primeira linha (cabeçalho)
             String[] columns = header.split("\\|"); // Divide pelo caractere '|'
 
             for (int i = 0; i < columns.length; i++) {
@@ -57,49 +57,16 @@ public class FileProcessorService {
             }
         }
 
-        // Ordena a árvore
+        // Ordena a arvore
         sortTree(rootNode);
-        globalJson = rootNode;  // Armazena o JSON na variável global
+        globalJson = rootNode;  // Armazena o JSON na variavel global
     }
 
-    // Método para retornar o JSON completo
+    // Metodo para retornar o JSON completo
     public TreeNode getGlobalJson() {
         return globalJson;
     }
-
-    // Método para aplicar a máscara
-    private String applyMask(String classification) {
-        String mask = generateMask(classification.length());
-        StringBuilder formatted = new StringBuilder();
-        int classIndex = 0;
-
-        for (int i = 0; i < mask.length(); i++) {
-            if (mask.charAt(i) == '9') {
-                formatted.append(classification.charAt(classIndex));
-                classIndex++;
-            } else {
-                formatted.append(mask.charAt(i));
-            }
-        }
-        return formatted.toString();
-    }
-
-    private String generateMask(int length) {
-        switch (length) {
-            case 1:
-                return "9";
-            case 3:
-                return "9.99";
-            case 6:
-                return "9.99.999";
-            case 10:
-                return "9.99.999.9999";
-            default:
-                return "9".repeat(length);
-        }
-    }
-
-    // Método para adicionar os dados ao JSON em árvore
+    // Metodo para adicionar os dados ao JSON em arvore
     private void addToJsonTree(TreeNode rootNode, String classification, String descricao) {
         String[] parts = classification.split("\\.");
         StringBuilder path = new StringBuilder();
@@ -122,7 +89,7 @@ public class FileProcessorService {
         currentNode.setDescricao(descricao);
     }
 
-    // Método recursivo para ordenar os grupos
+    // Metodo recursivo para ordenar os grupos
     private void sortTree(TreeNode rootNode) {
         List<TreeNode> grupos = rootNode.getGrupos();
         if (grupos != null) {
@@ -136,44 +103,50 @@ public class FileProcessorService {
         }
     }
 
-    // Método para encontrar um nó existente na árvore pelo path
-    private TreeNode findNode(TreeNode parent, String path) {
-        for (TreeNode grupo : parent.getGrupos()) {
-            if (grupo.getClassificacao().equals(path)) {
-                return grupo;
-            }
-        }
-        return null;
-    }
-
-    /*// Método para aplicar a máscara à classificação
-    private String applyMask(String classificacao) {
-        // Defina a máscara de forma dinâmica: por exemplo, "9.99.999.9999"
-        // ou a lógica para dividir em grupos conforme a quantidade de dígitos
+    // Metodo para aplicar a mascara
+    private String applyMask(String classification) {
+        String mask = generateMask(classification.length());
         StringBuilder formatted = new StringBuilder();
-        int[] mask = {1, 2, 3, 4}; // Exemplo de máscara que define a hierarquia de classificação
+        int classIndex = 0;
 
-        int index = 0;
-        for (int i = 0; i < mask.length; i++) {
-            int length = mask[i];
-            if (index + length <= classificacao.length()) {
-                formatted.append(classificacao.substring(index, index + length));
-                index += length;
-                if (i < mask.length - 1) {
-                    formatted.append(".");
-                }
+        for (int i = 0; i < mask.length(); i++) {
+            if (mask.charAt(i) == '9') {
+                formatted.append(classification.charAt(classIndex));
+                classIndex++;
+            } else {
+                formatted.append(mask.charAt(i));
+            }
+        }
+        return formatted.toString();
+    }
+
+    // Metodo que gera a mascara dependendo do tamanho da string
+    private String generateMask(int length) {
+        String mask = "";
+        int nivel = 1;
+        int numPorNivel = 0;
+        for (int i = 0; i < length; i++) {
+            mask+= "9";
+            numPorNivel++;
+            if (numPorNivel == nivel && i < (length - 1)) {
+                mask+= ".";
+                numPorNivel = 0;
+                nivel++;
             }
         }
 
-        return formatted.toString();
-    }*/
-
-    /// Método para filtrar por classificação
-    public TreeNode filterByClassificacao(TreeNode json, String classificacao) {
-        return filterGrupoByClassificacao(json, classificacao);
+        return mask;
     }
 
-    // Método recursivo para filtrar os grupos por classificação
+    // Metodo para filtrar por classificacao
+    public List<TreeNode> filterByClassificacao(TreeNode json, String classificacao) {
+        TreeNode filterTreeNode = filterGrupoByClassificacao(json, classificacao);
+        List<TreeNode> treeNodeList = new ArrayList<>();
+        treeNodeList.add(filterTreeNode);
+        return treeNodeList;
+    }
+
+    // Metodo recursivo para filtrar os grupos por classificacao
     private TreeNode filterGrupoByClassificacao(TreeNode grupo, String classificacao) {
         if (grupo.getClassificacao().equals(classificacao)) {
             return grupo;
