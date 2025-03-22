@@ -7,6 +7,7 @@ import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -20,10 +21,17 @@ public class FileProcessorServiceTest {
     @Test
     public void testLoadJsonFromFile() throws IOException {
         String filePath = "C:/Users/matheus.cabral/Documents/RP Info/teste.txt";
-
         fileProcessorService.loadJsonFromFile(filePath);
 
         assertNotNull(fileProcessorService.getGlobalJson());
+    }
+
+    @Test
+    public void testLoadJsonFromFileColumnError() throws IOException {
+        String filePath = "C:/Users/matheus.cabral/Documents/RP Info/testeColunaErro.txt";
+        fileProcessorService.loadJsonFromFile(filePath);
+
+        assertNull(fileProcessorService.getGlobalJson());
     }
 
     @Test
@@ -42,6 +50,16 @@ public class FileProcessorServiceTest {
         result = fileProcessorService.filterByClassificacao(rootNode, "3.1");
         assertEquals("3.1", result.get(0).getClassificacao());
         assertEquals("teste2", result.get(0).getDescricao());
+    }
+
+    @Test
+    public void testFilterByClassificacaoReturnNull() {
+        TreeNode rootNode = new TreeNode("2", "teste");
+        List<TreeNode> treeNodeList = new ArrayList<>();
+
+        List<TreeNode> result = fileProcessorService.filterByClassificacao(rootNode, "3");
+
+        assertEquals(treeNodeList, result);
     }
 
     @Test

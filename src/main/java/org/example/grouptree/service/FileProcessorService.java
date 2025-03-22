@@ -142,7 +142,8 @@ public class FileProcessorService {
     public List<TreeNode> filterByClassificacao(TreeNode json, String classificacao) {
         TreeNode filterTreeNode = filterGrupoByClassificacao(json, classificacao);
         List<TreeNode> treeNodeList = new ArrayList<>();
-        treeNodeList.add(filterTreeNode);
+        if (filterTreeNode != null) treeNodeList.add(filterTreeNode);
+
         return treeNodeList;
     }
 
