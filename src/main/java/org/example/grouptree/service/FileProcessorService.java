@@ -1,6 +1,8 @@
 package org.example.grouptree.service;
 
 import org.example.grouptree.model.TreeNode;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.io.BufferedReader;
@@ -12,13 +14,19 @@ import java.util.*;
 public class FileProcessorService {
 
     private TreeNode globalJson;
+    private static final Logger logger = LoggerFactory.getLogger(FileProcessorService.class);
 
     // Metodo para processar o arquivo e construir o JSON
     public void loadJsonFromFile(String filePath) throws IOException {
-        TreeNode rootNode = new TreeNode("grupos", "");
+        TreeNode rootNode = new TreeNode("raiz", "grupos");
 
         try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
             String header = reader.readLine(); // Le a primeira linha (cabeçalho)
+
+            if (header == null || header.isEmpty()) {
+                throw new IllegalArgumentException("O arquivo não contém cabeçalho. Caminho: " + filePath);
+            }
+
             String[] columns = header.split("\\|"); // Divide pelo caractere '|'
 
             for (int i = 0; i < columns.length; i++) {
@@ -28,6 +36,7 @@ public class FileProcessorService {
             int classificationIndex = -1;
             int descriptionIndex = -1;
 
+            // Localiza os índices das colunas
             for (int i = 0; i < columns.length; i++) {
                 if (columns[i].equalsIgnoreCase("grup_classificacao")) {
                     classificationIndex = i;
@@ -38,13 +47,14 @@ public class FileProcessorService {
             }
 
             if (classificationIndex == -1 || descriptionIndex == -1) {
-                System.out.println("Colunas necessárias não encontradas no arquivo.");
+                logger.warn("Colunas necessárias não encontradas no arquivo.");
                 return;
             }
 
             String line;
             while ((line = reader.readLine()) != null) {
                 String[] values = line.split("\\|");
+
                 for (int i = 0; i < values.length; i++) {
                     values[i] = values[i].replace("\"", "").trim();
                 }
@@ -52,9 +62,16 @@ public class FileProcessorService {
                 String classification = values[classificationIndex];
                 String descricao = values[descriptionIndex];
 
+                // Tratamento de valores(classificacao e descricao) nulos ou vazios
+                if (classification == null || classification.isEmpty() || descricao == null || descricao.isEmpty()) {
+                    throw new IllegalArgumentException("Classificação ou descrição vazia na linha: " + line);
+                }
+
                 String formattedClassification = applyMask(classification);
                 addToJsonTree(rootNode, formattedClassification, descricao);
             }
+        } catch (Exception e) {
+            logger.error(e.getMessage());
         }
 
         // Ordena a arvore
@@ -66,6 +83,7 @@ public class FileProcessorService {
     public TreeNode getGlobalJson() {
         return globalJson;
     }
+
     // Metodo para adicionar os dados ao JSON em arvore
     private void addToJsonTree(TreeNode rootNode, String classification, String descricao) {
         String[] parts = classification.split("\\.");
@@ -122,26 +140,33 @@ public class FileProcessorService {
 
     // Metodo que gera a mascara dependendo do tamanho da string
     private String generateMask(int length) {
-        String mask = "";
+        StringBuilder mask = new StringBuilder();
         int nivel = 1;
         int numPorNivel = 0;
+
         for (int i = 0; i < length; i++) {
-            mask+= "9";
+            mask.append("9");
             numPorNivel++;
+
             if (numPorNivel == nivel && i < (length - 1)) {
-                mask+= ".";
+                mask.append(".");
                 numPorNivel = 0;
                 nivel++;
             }
         }
 
-        return mask;
+        return mask.toString();
     }
 
     // Metodo para filtrar por classificacao
     public List<TreeNode> filterByClassificacao(TreeNode json, String classificacao) {
-        TreeNode filterTreeNode = filterGrupoByClassificacao(json, classificacao);
         List<TreeNode> treeNodeList = new ArrayList<>();
+        if (json == null) {
+            logger.warn("JSON está nulo");
+            return treeNodeList;
+        }
+
+        TreeNode filterTreeNode = filterGrupoByClassificacao(json, classificacao);
         if (filterTreeNode != null) treeNodeList.add(filterTreeNode);
 
         return treeNodeList;

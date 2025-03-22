@@ -35,6 +35,18 @@ public class FileProcessorServiceTest {
     }
 
     @Test
+    public void testLoadJsonFromFileClassificationEmpty() throws IOException {
+        String filePath = "C:/Users/matheus.cabral/Documents/RP Info/testeSemClassificacao.txt";
+
+        fileProcessorService.loadJsonFromFile(filePath);
+        TreeNode globalJson = fileProcessorService.getGlobalJson();
+
+        assertNotNull(globalJson);
+        assertEquals("raiz", globalJson.getClassificacao());
+        assertEquals("grupos", globalJson.getDescricao());
+    }
+
+    @Test
     public void testFilterByClassificacao() {
         TreeNode rootNode = new TreeNode("3", "teste");
         TreeNode rootNode2 = new TreeNode("3.1", "teste2");
@@ -53,7 +65,15 @@ public class FileProcessorServiceTest {
     }
 
     @Test
-    public void testFilterByClassificacaoReturnNull() {
+    public void testFilterByClassificacaoJsonNull() {
+        List<TreeNode> result = fileProcessorService.filterByClassificacao(null, "3");
+
+        assertNotNull(result);
+        assertEquals(0, result.size());
+    }
+
+    @Test
+    public void testFilterGrupoByClassificacaoReturnNull() {
         TreeNode rootNode = new TreeNode("2", "teste");
         List<TreeNode> treeNodeList = new ArrayList<>();
 
