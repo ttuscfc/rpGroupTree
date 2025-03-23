@@ -1,0 +1,6 @@
+"grup_codigo"|"grup_classifica"|"grup_descric"|"grup_prodserv"|"grup_decimaisest"|"grup_recuo"|"grup_periodos"|"grup_codigoncm"|"grup_comissao"|"grup_dpto_codigo"|"grup_comportamento"|"grup_classfiscal"|"grup_tipoitem"|"grup_dtestmin"|"grup_ctrlestmin"|"grup_percabast"|"grup_abatimento"|"grup_extra1"|"grup_extra2"|"grup_extra3"|"grup_extra4"|"grup_extra5"|"grup_extra6"|"grup_extra7"|"grup_extra8"|"grup_extra9"|"grup_grupo_ecomm"|"grup_dthrmanutencao"|"grup_dthrintegracao"|"grup_margemecomm"
+"11862"|"5010060002"| Casal|P|3||||||||||||||||||||||0||2022-10-04 15:28:27.000|
+"11861"|"5010060001"| Solteiro|P|3||||||||||||||||||||||0||2022-10-04 15:28:27.000|
+"11039"|"2010030006"|"10kg"|P|3||||||||||||||||||||||0||2022-10-04 15:28:27.000|
+"11617"|"327010"|Abridor|P|3||||||||||||||||||||||0||2022-10-04 15:28:27.000|
+"10719"|"501006"|Colchao|P|3||||||||||||||||||||||0||2022-10-04 15:28:27.000|
