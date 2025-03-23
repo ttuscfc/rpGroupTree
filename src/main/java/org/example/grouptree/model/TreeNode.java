@@ -15,6 +15,8 @@ public class TreeNode {
     @JsonProperty("grupos")
     private List<TreeNode> grupos;
 
+    public TreeNode() {}
+
     public TreeNode(String classificacao, String descricao) {
         this.classificacao = classificacao;
         this.descricao = descricao;
