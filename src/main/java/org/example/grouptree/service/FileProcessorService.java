@@ -1,5 +1,6 @@
 package org.example.grouptree.service;
 
+import org.example.grouptree.model.GrupoResponse;
 import org.example.grouptree.model.TreeNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,7 +14,7 @@ import java.util.*;
 @Service
 public class FileProcessorService {
 
-    private TreeNode globalJson;
+    private GrupoResponse globalJson = new GrupoResponse();
     private static final Logger logger = LoggerFactory.getLogger(FileProcessorService.class);
 
     // Metodo para processar o arquivo e construir o JSON
@@ -76,11 +77,12 @@ public class FileProcessorService {
 
         // Ordena a arvore
         sortTree(rootNode);
-        globalJson = rootNode;  // Armazena o JSON na variavel global
+        List<TreeNode> treeNodeList = rootNode.getGrupos();
+        globalJson.setGrupos(treeNodeList);  // Armazena o JSON na variavel global
     }
 
     // Metodo para retornar o JSON completo
-    public TreeNode getGlobalJson() {
+    public GrupoResponse getGlobalJson() {
         return globalJson;
     }
 
@@ -159,17 +161,23 @@ public class FileProcessorService {
     }
 
     // Metodo para filtrar por classificacao
-    public List<TreeNode> filterByClassificacao(TreeNode json, String classificacao) {
-        List<TreeNode> treeNodeList = new ArrayList<>();
-        if (json == null) {
+    public GrupoResponse filterByClassificacao(List<TreeNode> jsonList, String classificacao) {
+       List<TreeNode> treeNodeList = new ArrayList<>();
+        GrupoResponse grupoResponse = new GrupoResponse(treeNodeList);
+        if (jsonList == null) {
             logger.warn("JSON está nulo");
-            return treeNodeList;
+            return grupoResponse;
         }
 
-        TreeNode filterTreeNode = filterGrupoByClassificacao(json, classificacao);
-        if (filterTreeNode != null) treeNodeList.add(filterTreeNode);
+        for (TreeNode tn : jsonList) {
+            TreeNode filterTreeNode = filterGrupoByClassificacao(tn, classificacao);
+            if (filterTreeNode != null) {
+                treeNodeList.add(filterTreeNode);
+                break;
+            }
+        }
 
-        return treeNodeList;
+        return grupoResponse;
     }
 
     // Metodo recursivo para filtrar os grupos por classificacao

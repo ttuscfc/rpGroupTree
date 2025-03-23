@@ -1,6 +1,7 @@
 package org.example.grouptree.controller;
 
 import org.example.grouptree.model.ErrorResponse;
+import org.example.grouptree.model.GrupoResponse;
 import org.example.grouptree.service.FileProcessorService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -26,18 +27,15 @@ public class GroupApiController {
     @GetMapping
     public ResponseEntity<?> getGrupos(@RequestParam(value = "classificacao", required = false) String classificacao) {
         try {
-            TreeNode globalJson = fileProcessorService.getGlobalJson();
-            List<TreeNode> allJson = new ArrayList<>();
-            if (globalJson != null) {
-                allJson = globalJson.getGrupos();
-            }
+            GrupoResponse globalJson = fileProcessorService.getGlobalJson();
 
             if (classificacao == null || classificacao.isEmpty()) {
                 // Retorna o JSON completo
-                return ResponseEntity.ok(allJson);
+                return ResponseEntity.ok(globalJson);
             } else {
                 // Filtra o JSON com base na classificacao
-                return ResponseEntity.ok(fileProcessorService.filterByClassificacao(globalJson, classificacao));
+                List<TreeNode> grupos = globalJson.getGrupos();
+                return ResponseEntity.ok(fileProcessorService.filterByClassificacao(grupos, classificacao));
             }
         } catch (Exception ex) {
             // Em caso de erro, retorna uma resposta de erro

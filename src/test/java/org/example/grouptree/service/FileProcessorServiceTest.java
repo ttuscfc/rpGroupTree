@@ -1,5 +1,6 @@
 package org.example.grouptree.service;
 
+import org.example.grouptree.model.GrupoResponse;
 import org.example.grouptree.model.TreeNode;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -29,21 +30,25 @@ public class FileProcessorServiceTest {
     @Test
     public void testLoadJsonFromFileColumnError() throws IOException {
         String filePath = "C:/Users/matheus.cabral/Documents/RP Info/testeColunaErro.txt";
+        GrupoResponse grupoResponse = new GrupoResponse();
         fileProcessorService.loadJsonFromFile(filePath);
 
-        assertNull(fileProcessorService.getGlobalJson());
+        GrupoResponse globalJson = fileProcessorService.getGlobalJson();
+
+        assertNotNull(globalJson);
+        assertEquals(grupoResponse.getGrupos(), globalJson.getGrupos());
     }
 
     @Test
     public void testLoadJsonFromFileClassificationEmpty() throws IOException {
         String filePath = "C:/Users/matheus.cabral/Documents/RP Info/testeSemClassificacao.txt";
-
+        GrupoResponse grupoResponse = new GrupoResponse(new ArrayList<>());
         fileProcessorService.loadJsonFromFile(filePath);
-        TreeNode globalJson = fileProcessorService.getGlobalJson();
+
+        GrupoResponse globalJson = fileProcessorService.getGlobalJson();
 
         assertNotNull(globalJson);
-        assertEquals("raiz", globalJson.getClassificacao());
-        assertEquals("grupos", globalJson.getDescricao());
+        assertEquals(grupoResponse.getGrupos(), globalJson.getGrupos());
     }
 
     @Test
@@ -51,35 +56,39 @@ public class FileProcessorServiceTest {
         TreeNode rootNode = new TreeNode("3", "teste");
         TreeNode rootNode2 = new TreeNode("3.1", "teste2");
         rootNode.addGrupo(rootNode2);
+        List<TreeNode> treeNodeList = new ArrayList<>();
+        treeNodeList.add(rootNode);
 
-        List<TreeNode> result = fileProcessorService.filterByClassificacao(rootNode, "3");
+        GrupoResponse result = fileProcessorService.filterByClassificacao(treeNodeList, "3");
 
         assertNotNull(result);
-        assertEquals(1, result.size());
-        assertEquals("3", result.get(0).getClassificacao());
-        assertEquals("teste", result.get(0).getDescricao());
+        assertEquals(1, result.getGrupos().size());
+        assertEquals("3", result.getGrupos().get(0).getClassificacao());
+        assertEquals("teste", result.getGrupos().get(0).getDescricao());
 
-        result = fileProcessorService.filterByClassificacao(rootNode, "3.1");
-        assertEquals("3.1", result.get(0).getClassificacao());
-        assertEquals("teste2", result.get(0).getDescricao());
+        result = fileProcessorService.filterByClassificacao(treeNodeList, "3.1");
+        assertEquals("3.1", result.getGrupos().get(0).getClassificacao());
+        assertEquals("teste2", result.getGrupos().get(0).getDescricao());
     }
 
     @Test
     public void testFilterByClassificacaoJsonNull() {
-        List<TreeNode> result = fileProcessorService.filterByClassificacao(null, "3");
+        GrupoResponse result = fileProcessorService.filterByClassificacao(null, "3");
 
         assertNotNull(result);
-        assertEquals(0, result.size());
+        assertEquals(0, result.getGrupos().size());
     }
 
     @Test
     public void testFilterGrupoByClassificacaoReturnNull() {
         TreeNode rootNode = new TreeNode("2", "teste");
         List<TreeNode> treeNodeList = new ArrayList<>();
+        treeNodeList.add(rootNode);
+        GrupoResponse grupoResponse = new GrupoResponse(new ArrayList<>());
 
-        List<TreeNode> result = fileProcessorService.filterByClassificacao(rootNode, "3");
+        GrupoResponse result = fileProcessorService.filterByClassificacao(treeNodeList, "3");
 
-        assertEquals(treeNodeList, result);
+        assertEquals(grupoResponse.getGrupos(), result.getGrupos());
     }
 
     @Test

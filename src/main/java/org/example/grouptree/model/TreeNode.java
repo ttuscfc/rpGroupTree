@@ -1,15 +1,20 @@
 package org.example.grouptree.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.ArrayList;
 import java.util.List;
 
 public class TreeNode {
 
+    @JsonProperty("classificacao")
     private String classificacao;
+
+    @JsonProperty("descricao")
     private String descricao;
+
+    @JsonProperty("grupos")
     private List<TreeNode> grupos;
 
-    // Construtor com 2 parâmetros: classificacao e descricao
     public TreeNode(String classificacao, String descricao) {
         this.classificacao = classificacao;
         this.descricao = descricao;
@@ -44,7 +49,7 @@ public class TreeNode {
         this.grupos.add(grupo);
     }
 
-    // Método para encontrar um grupo baseado na classificação
+    // Metodo para encontrar um grupo baseado na classificacao
     public TreeNode getGrupoByClassificacao(String classificacao) {
         for (TreeNode grupo : grupos) {
             if (grupo.getClassificacao().equals(classificacao)) {
@@ -52,18 +57,6 @@ public class TreeNode {
             }
         }
         return null;
-    }
-
-    // Método para adicionar ou atualizar um grupo, baseado na classificação
-    public TreeNode addOrUpdateGrupo(String classificacao, String descricao) {
-        TreeNode grupo = getGrupoByClassificacao(classificacao);
-        if (grupo == null) {
-            grupo = new TreeNode(classificacao, descricao);
-            addGrupo(grupo);
-        } else {
-            grupo.setDescricao(descricao);  // Se já existe, atualiza a descrição
-        }
-        return grupo;
     }
 
     @Override
