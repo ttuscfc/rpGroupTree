@@ -6,6 +6,8 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
+import java.util.Scanner;
+
 @SpringBootApplication
 public class GroupTreeApplication implements CommandLineRunner {
 
@@ -20,7 +22,12 @@ public class GroupTreeApplication implements CommandLineRunner {
     public void run(String... args) throws Exception {
         System.out.println("Starting group tree application");
 
-        String filePath = "C:/Users/matheus.cabral/Documents/RP Info/grupos.txt";
+        // Usa o Scanner para ler o caminho do arquivo(Ex de caminho: C:/Users/matheus.cabral/Documents/RP Info/grupos.txt)
+        Scanner scanner = new Scanner(System.in);
+        System.out.print("Informe o caminho do arquivo: ");
+        String filePath = scanner.nextLine(); // Captura o caminho do arquivo informado pelo usuário
+
+        // Carrega o JSON com o caminho fornecido pelo usuário
         fileProcessorService.loadJsonFromFile(filePath);
 
         System.out.println("Finished group tree application");
