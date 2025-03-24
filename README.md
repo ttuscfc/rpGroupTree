@@ -12,7 +12,7 @@
 * O programa ordena os nós da árvore pela classificação
 * A árvore é salva em memória
 * Para visualizar a árvore completa, foi criado o endpoint http://localhost:8081/api/grupos que é uma requisição do tipo GET 
-	* No caso foi alterado no arquivo properties para utilizar a porta 8081
+	* No caso foi alterado no arquivo [properties](https://github.com/ttuscfc/rpGroupTree/blob/master/src/main/resources/application.properties) para utilizar a porta 8081
 	* Ao executar o endpoint, será realizada a busca em memória da árvore completa
 * Para filtrar a árvore pela classificação foi adicionado ao endpoint o parâmetro "classificacao". Portanto, se, por exemplo, for necessário filtrar a árvore pela classificação 3, o endpoint ficaria assim http://localhost:8081/api/grupos?classificacao=3
 	* Ao executar o endpoint, será realizada a busca em memória do nó da árvore que possua a classificação enviada por parâmetro e irá retornar o nó com seus filhos(Ex: 3, 3.1, 3.1.1, 3.1.1.1)
