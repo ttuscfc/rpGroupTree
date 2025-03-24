@@ -25,8 +25,9 @@ public class FileProcessorServiceTest {
     public void testLoadJsonFromFile() throws IOException {
         Path path = Paths.get("arquivos/teste.txt");
         String filePath = path.toAbsolutePath().toString();
+        String mask = "9.99.999.9999";
 
-        fileProcessorService.loadJsonFromFile(filePath);
+        fileProcessorService.loadJsonFromFile(filePath, mask);
 
         assertNotNull(fileProcessorService.getGlobalJson());
     }
@@ -35,9 +36,10 @@ public class FileProcessorServiceTest {
     public void testLoadJsonFromFileColumnError() throws IOException {
         Path path = Paths.get("arquivos/testeColunaErro.txt");
         String filePath = path.toAbsolutePath().toString();
+        String mask = "9.99.999.9999";
 
         GrupoResponse grupoResponse = new GrupoResponse();
-        fileProcessorService.loadJsonFromFile(filePath);
+        fileProcessorService.loadJsonFromFile(filePath, mask);
 
         GrupoResponse globalJson = fileProcessorService.getGlobalJson();
 
@@ -49,9 +51,10 @@ public class FileProcessorServiceTest {
     public void testLoadJsonFromFileClassificationEmpty() throws IOException {
         Path path = Paths.get("arquivos/testeSemClassificacao.txt");
         String filePath = path.toAbsolutePath().toString();
+        String mask = "9.99.999.9999";
 
         GrupoResponse grupoResponse = new GrupoResponse(new ArrayList<>());
-        fileProcessorService.loadJsonFromFile(filePath);
+        fileProcessorService.loadJsonFromFile(filePath, mask);
 
         GrupoResponse globalJson = fileProcessorService.getGlobalJson();
 
@@ -63,9 +66,10 @@ public class FileProcessorServiceTest {
     public void testLoadJsonFromFileFileEmpty() throws IOException {
         Path path = Paths.get("arquivos/testeVazio.txt");
         String filePath = path.toAbsolutePath().toString();
+        String mask = "9.99.999.9999";
 
         GrupoResponse grupoResponse = new GrupoResponse(new ArrayList<>());
-        fileProcessorService.loadJsonFromFile(filePath);
+        fileProcessorService.loadJsonFromFile(filePath, mask);
 
         GrupoResponse globalJson = fileProcessorService.getGlobalJson();
 
@@ -117,8 +121,9 @@ public class FileProcessorServiceTest {
     public void testGetGlobalJson() throws IOException {
         Path path = Paths.get("arquivos/teste.txt");
         String filePath = path.toAbsolutePath().toString();
+        String mask = "9.99.999.9999";
 
-        fileProcessorService.loadJsonFromFile(filePath);
+        fileProcessorService.loadJsonFromFile(filePath, mask);
 
         assertNotNull(fileProcessorService.getGlobalJson());
     }

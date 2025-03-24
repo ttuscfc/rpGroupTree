@@ -18,7 +18,7 @@ public class FileProcessorService {
     private static final Logger logger = LoggerFactory.getLogger(FileProcessorService.class);
 
     // Metodo para processar o arquivo e construir o JSON
-    public void loadJsonFromFile(String filePath) throws IOException {
+    public void loadJsonFromFile(String filePath, String mascara) throws IOException {
         TreeNode rootNode = new TreeNode("raiz", "grupos");
 
         try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
@@ -68,7 +68,7 @@ public class FileProcessorService {
                     throw new IllegalArgumentException("Classificação ou descrição vazia na linha: " + line);
                 }
 
-                String formattedClassification = applyMask(classification);
+                String formattedClassification = applyMask(classification, mascara);
                 addToJsonTree(rootNode, formattedClassification, descricao);
             }
         } catch (Exception e) {
@@ -124,16 +124,28 @@ public class FileProcessorService {
     }
 
     // Metodo para aplicar a mascara
-    private String applyMask(String classification) {
-        String mask = generateMask(classification.length());
+    private String applyMask(String classification, String mask) {
+        //String mask = generateMask(classification.length());
         StringBuilder formatted = new StringBuilder();
         int classIndex = 0;
 
+        // Verifica se a quantidade de '9' na máscara é suficiente para a classificação
+        int maskCount = 0;
+        for (char c : mask.toCharArray()) {
+            if (c == '9') {
+                maskCount++;
+            }
+        }
+
+        if (maskCount < classification.length()) {
+            throw new IllegalArgumentException("A máscara não é suficiente para a classificação fornecida.");
+        }
+
         for (int i = 0; i < mask.length(); i++) {
-            if (mask.charAt(i) == '9') {
+            if (mask.charAt(i) == '9' && classIndex < classification.length()) {
                 formatted.append(classification.charAt(classIndex));
                 classIndex++;
-            } else {
+            } else if (mask.charAt(i) != '9') {
                 formatted.append(mask.charAt(i));
             }
         }
