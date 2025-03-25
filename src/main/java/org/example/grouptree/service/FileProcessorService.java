@@ -92,21 +92,30 @@ public class FileProcessorService {
         StringBuilder path = new StringBuilder();
 
         TreeNode currentNode = rootNode;
-        for (String part : parts) {
-            path.append(part);
+        for (int i = 0; i < parts.length; i++) {
+            path.append(parts[i]);
             String pathStr = path.toString();
 
             TreeNode nextNode = currentNode.getGrupoByClassificacao(pathStr);
-            if (nextNode == null) {
-                nextNode = new TreeNode(pathStr, "");
+            if (nextNode != null) {
+                currentNode = nextNode;
+            }
+
+            if (i == parts.length - 1) {
+                nextNode = new TreeNode(pathStr, descricao);
+                List<TreeNode> gruposContainsClassificacao = currentNode.getGruposContainsClassificacao(classification + ".");
+
+                if (!gruposContainsClassificacao.isEmpty()) {
+                    for (TreeNode grupo : gruposContainsClassificacao) {
+                        nextNode.addGrupo(grupo);
+                        currentNode.removeGrupo(grupo);
+                    }
+                }
+
                 currentNode.addGrupo(nextNode);
             }
-            currentNode = nextNode;
             path.append(".");
         }
-
-        currentNode.setClassificacao(classification);
-        currentNode.setDescricao(descricao);
     }
 
     // Metodo recursivo para ordenar os grupos
@@ -145,31 +154,11 @@ public class FileProcessorService {
             if (mask.charAt(i) == '9' && classIndex < classification.length()) {
                 formatted.append(classification.charAt(classIndex));
                 classIndex++;
-            } else if (mask.charAt(i) != '9') {
+            } else if (mask.charAt(i) != '9' && classIndex < classification.length()) {
                 formatted.append(mask.charAt(i));
             }
         }
         return formatted.toString();
-    }
-
-    // Metodo que gera a mascara dependendo do tamanho da string
-    private String generateMask(int length) {
-        StringBuilder mask = new StringBuilder();
-        int nivel = 1;
-        int numPorNivel = 0;
-
-        for (int i = 0; i < length; i++) {
-            mask.append("9");
-            numPorNivel++;
-
-            if (numPorNivel == nivel && i < (length - 1)) {
-                mask.append(".");
-                numPorNivel = 0;
-                nivel++;
-            }
-        }
-
-        return mask.toString();
     }
 
     // Metodo para filtrar por classificacao

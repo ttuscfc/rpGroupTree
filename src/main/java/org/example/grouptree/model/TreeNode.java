@@ -51,6 +51,10 @@ public class TreeNode {
         this.grupos.add(grupo);
     }
 
+    public void removeGrupo(TreeNode grupo) {
+        grupos.remove(grupo);
+    }
+
     // Metodo para encontrar um grupo baseado na classificacao
     public TreeNode getGrupoByClassificacao(String classificacao) {
         for (TreeNode grupo : grupos) {
@@ -59,6 +63,16 @@ public class TreeNode {
             }
         }
         return null;
+    }
+
+    public List<TreeNode> getGruposContainsClassificacao(String classificacao) {
+        List<TreeNode> lista = new ArrayList<>();
+        for (TreeNode grupo : grupos) {
+            if (grupo.getClassificacao().startsWith(classificacao)) {
+                lista.add(grupo);
+            }
+        }
+        return lista;
     }
 
     @Override
