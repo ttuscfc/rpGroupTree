@@ -69,7 +69,7 @@ public class FileProcessorService {
                 }
 
                 String formattedClassification = applyMask(classification, mascara);
-                addToJsonTree(rootNode, formattedClassification, descricao);
+                if (formattedClassification != null) addToJsonTree(rootNode, formattedClassification, descricao);
             }
         } catch (Exception e) {
             logger.error(e.getMessage());
@@ -134,30 +134,38 @@ public class FileProcessorService {
 
     // Metodo para aplicar a mascara
     private String applyMask(String classification, String mask) {
-        //String mask = generateMask(classification.length());
         StringBuilder formatted = new StringBuilder();
         int classIndex = 0;
 
+        // Separa a máscara em partes, considerando os pontos como delimitadores
+        String[] maskParts = mask.split("\\.");
+
         // Verifica se a quantidade de '9' na máscara é suficiente para a classificação
         int maskCount = 0;
-        for (char c : mask.toCharArray()) {
-            if (c == '9') {
-                maskCount++;
-            }
+        for (String part : maskParts) {
+            maskCount += part.length();
         }
 
         if (maskCount < classification.length()) {
-            throw new IllegalArgumentException("A máscara não é suficiente para a classificação fornecida.");
+            logger.warn("A máscara " + mask + " não é suficiente para a classificação " + classification + " fornecida.");
+            return null;
         }
 
-        for (int i = 0; i < mask.length(); i++) {
-            if (mask.charAt(i) == '9' && classIndex < classification.length()) {
-                formatted.append(classification.charAt(classIndex));
-                classIndex++;
-            } else if (mask.charAt(i) != '9' && classIndex < classification.length()) {
-                formatted.append(mask.charAt(i));
+        // Aplica a máscara
+        for (int i = 0; i < maskParts.length; i++) {
+            for (int j = 0; j < maskParts[i].length(); j++) {
+                if (maskParts[i].charAt(j) == '9' && classIndex < classification.length()) {
+                    formatted.append(classification.charAt(classIndex));
+                    classIndex++;
+                }
+            }
+
+            // Adiciona o ponto (se não for a última parte)
+            if (classIndex < classification.length() && i < maskParts.length - 1) {
+                formatted.append(".");
             }
         }
+
         return formatted.toString();
     }
 
