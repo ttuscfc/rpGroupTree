@@ -10,6 +10,8 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Service
 public class FileProcessorService {
@@ -19,6 +21,12 @@ public class FileProcessorService {
 
     // Metodo para processar o arquivo e construir o JSON
     public void loadJsonFromFile(String filePath, String mascara) throws IOException {
+        // Valida a máscara
+        if (!isValidMask(mascara)) {
+            logger.error("Máscara inválida! A máscara deve conter apenas o delimitador '.'");
+            return;
+        }
+
         TreeNode rootNode = new TreeNode("raiz", "grupos");
 
         try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
@@ -82,6 +90,15 @@ public class FileProcessorService {
         List<TreeNode> treeNodeList = rootNode.getGrupos();
         // Armazena o JSON na variavel global
         globalJson.setGrupos(treeNodeList);
+    }
+
+    // Metodo para validar a máscara
+    private boolean isValidMask(String mascara) {
+        // Verifica se a máscara contém apenas caracteres alfanuméricos e pontos como delimitadores
+        String regex = "^[a-zA-Z0-9]+(\\.[a-zA-Z0-9]+)*$";
+        Pattern pattern = Pattern.compile(regex);
+        Matcher matcher = pattern.matcher(mascara);
+        return matcher.matches();
     }
 
     // Metodo para retornar o JSON completo
@@ -160,7 +177,7 @@ public class FileProcessorService {
         // Aplica a máscara
         for (int i = 0; i < maskParts.length; i++) {
             for (int j = 0; j < maskParts[i].length(); j++) {
-                if (maskParts[i].charAt(j) == '9' && classIndex < classification.length()) {
+                if (classIndex < classification.length()) {
                     formatted.append(classification.charAt(classIndex));
                     classIndex++;
                 }
