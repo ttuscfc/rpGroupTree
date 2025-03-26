@@ -4,6 +4,7 @@
 * Foi utilizada a IDE IntelliJ
 * O programa está na branch master do git
 * Ao executar o programa, será solicitado que o usuário informe via console o caminho do arquivo que será lido e a máscara que será aplicada na classificação.
+* O programa valida a máscara e se não for uma máscara válida(com o delimitador '.'), não prossegue no método e a árvore será nula
 * O programa realiza as validações referentes ao arquivo e se não houver erros, irá ler o arquivo
 * O programa armazena a lista de colunas e a lista de valores em cada linha
 * A cada linha com valores que é lida, o sistema vai adicionando à arvore
