@@ -47,12 +47,14 @@ public class FileProcessorService {
                 }
             }
 
+            // Valida as colunas
             if (classificationIndex == -1 || descriptionIndex == -1) {
                 logger.warn("Colunas necessárias não encontradas no arquivo.");
                 return;
             }
 
             String line;
+            // Percorre as demais linhas do arquivo para montar a arvore
             while ((line = reader.readLine()) != null) {
                 String[] values = line.split("\\|");
 
@@ -78,7 +80,8 @@ public class FileProcessorService {
         // Ordena a arvore
         sortTree(rootNode);
         List<TreeNode> treeNodeList = rootNode.getGrupos();
-        globalJson.setGrupos(treeNodeList);  // Armazena o JSON na variavel global
+        // Armazena o JSON na variavel global
+        globalJson.setGrupos(treeNodeList);
     }
 
     // Metodo para retornar o JSON completo
@@ -103,15 +106,18 @@ public class FileProcessorService {
 
             if (i == parts.length - 1) {
                 nextNode = new TreeNode(pathStr, descricao);
+                // Verifica se há filhos para o nó
                 List<TreeNode> gruposContainsClassificacao = currentNode.getGruposContainsClassificacao(classification + ".");
 
                 if (!gruposContainsClassificacao.isEmpty()) {
                     for (TreeNode grupo : gruposContainsClassificacao) {
+                        //adiciona os nós filhos e remove a ligação com o pai anterior
                         nextNode.addGrupo(grupo);
                         currentNode.removeGrupo(grupo);
                     }
                 }
 
+                // Adiciona o nó(nextNode) ao pai(currentNode)
                 currentNode.addGrupo(nextNode);
             }
             path.append(".");

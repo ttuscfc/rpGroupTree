@@ -65,6 +65,7 @@ public class TreeNode {
         return null;
     }
 
+    // Metodo para retornar os nós que devem ser filhos do nó atual
     public List<TreeNode> getGruposContainsClassificacao(String classificacao) {
         List<TreeNode> lista = new ArrayList<>();
         for (TreeNode grupo : grupos) {

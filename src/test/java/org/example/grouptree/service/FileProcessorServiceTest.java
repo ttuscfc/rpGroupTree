@@ -78,6 +78,17 @@ public class FileProcessorServiceTest {
     }
 
     @Test
+    public void testLoadJsonFromFileWithOtherMask() throws IOException {
+        Path path = Paths.get("arquivos/teste.txt");
+        String filePath = path.toAbsolutePath().toString();
+        String mask = "99.99.99.99";
+
+        fileProcessorService.loadJsonFromFile(filePath, mask);
+
+        assertNotNull(fileProcessorService.getGlobalJson());
+    }
+
+    @Test
     public void testFilterByClassificacao() {
         TreeNode rootNode = new TreeNode("3", "teste");
         TreeNode rootNode2 = new TreeNode("3.1", "teste2");
