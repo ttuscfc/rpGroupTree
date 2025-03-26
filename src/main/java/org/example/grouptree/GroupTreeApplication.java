@@ -28,7 +28,7 @@ public class GroupTreeApplication implements CommandLineRunner {
         String filePath = scanner.nextLine(); // Captura o caminho do arquivo informado pelo usuário
 
         // Lê a mascara
-        System.out.println("Informe a máscara: ");
+        System.out.println("Informe a máscara(deve ser utilizado apenas o delimitador '.'): ");
         String mascara = scanner.nextLine(); // Captura a mascara a ser aplicada na classificacao
 
         // Carrega o JSON com o caminho fornecido pelo usuário
